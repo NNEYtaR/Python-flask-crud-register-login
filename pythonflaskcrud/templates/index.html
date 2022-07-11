@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home</title>
+        <!-- CSS only -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <br>
+            {% if session.email %}
+            <div class="alert alert-primary text-center" role="alert">
+                <h1>Welcome, {{ session.email }}<a href="/logout" class="btn btn-outline-danger" style="float:right;">Logout</a></h1>
+            </div>
+            {% else %}
+                <a href="/login" class="btn btn-outline-primarys" style="float:right;">Login</a>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                
+                <!-- content goes here -->
+                <div class="col-sm-8">
+                    <h3>Student List <button class="btn btn-outline-primary" style="float:right;" data-toggle="modal" data-target="#myModal">Add Student</button></h3>
+                    
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        <button type="button" class="btn-close" style="float:right;" data-dismiss="alert" aria-label="Close"></button>
+                        {{message}}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- Enter New Student Modal -->
+
+                    <div id="myModal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">Add New Student</h4>
+                                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{url_for('insert')}}" method="POST">
+                                        <div class="mb-3">
+                                            <label>Name</label>
+                                            <input type="text" name="name" class="form-control" id="name" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Email</label>
+                                            <input type="email" name="email" class="form-control" id="email" required>
+                                            <div id="emailHelp" class="form-text">example: happy@example.com</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Phone Number</label>
+                                            <input type="number" name="phone" class="form-control" id="phone" required>
+                                        </div>
+                                        <br>
+                                        <button type="submit" class="btn btn-outline-primary">Submit</button>
+                                        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End of Enter New Student Modal -->
+
+                    <!-- Show Student List  -->
+                    
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in student %}
+                            <tr>
+                                <td>{{row.0}}</td>
+                                <td>{{row.1}}</td>
+                                <td>{{row.2}}</td>
+                                <td>{{row.3}}</td>
+                                <td>
+                                    <a href="/update/{{ row.0 }}" class="btn btn-outline-warning btn-sm" data-toggle="modal" data-target="#editModal{{row.0}}">Edit</a>
+                                    <a href="/delete/{{ row.0 }}" onclick="return confirm('Are you sure to deleted?')" class="btn btn-outline-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+
+                            <!-- End of Show Student List  -->
+
+                            <!-- Enter Edit Student Modal -->
+
+                            <div id="editModal{{row.0}}" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">Update Student</h4>
+                                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{url_for('update')}}" method="POST">
+                                                <input type="hidden" name="id" value="{{ row.0 }}">
+                                                <div class="mb-3">
+                                                    <label>Name</label>
+                                                    <input value="{{row.1}}" type="text" name="name" class="form-control" id="name" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Email</label>
+                                                    <input value="{{row.2}}" type="email" name="email" class="form-control" id="email" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Phone Number</label>
+                                                    <input value="{{row.3}}" type="number" name="phone" class="form-control" id="phone" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-outline-primary">Save</button>
+                                                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancel</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- End of Enter Edit Student Modal -->
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- content ends here -->
+
+                <div class="col-sm-2"></div>
+            </div>
+        </div>
+            <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>    
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
+    </body>
+</html>
